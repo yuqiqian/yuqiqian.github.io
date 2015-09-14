@@ -7,12 +7,7 @@ alt: image-alt
 project-date: Feb 2015
 category: Web Development
 ---
-
-Yelp Refiner
-============
-
-1. Introduction
----------------
+## 1. Introduction
 
 Yelp does not provide keywords from its reviews. In a typical webpage of a store
 in Yelp, wordy reviews form a large part of the page. It might meet the
@@ -26,8 +21,7 @@ for those who has limited time to visit the website. We use different algorithms
 to generate keywords (TF-IDF and NLP), then the generated keywords can be
 presented on our website.
 
-2. Problem Definition
----------------------
+## 2. Problem Definition
 
 Yelp is a very useful tool for users to find shops they need. Users need to get
 the information from yelp reviews down below the shop website. However, yelp
@@ -38,8 +32,7 @@ efficiency of yelp can be highly improved. In our project, we try to create a
 review refiner to generate keywords from yelp reviews to improve the efficiency
 of yelp.
 
-3. Method
----------
+## 3. Method
 
 Our project use Django to build the web framework, and choose python as
 programming language. For text mining, the TF-IDF algorithm and application of
@@ -101,14 +94,30 @@ $D$  = the number of documents (the number of columns)
 $D_i$  = the number of documents in which word I appears (the number of non-zero
 columns in row i) 
 
-For application, the code is written as below. “float (v)” indicates the
-appearance times of candidate keywords in certain text(topic), “sum\_tf”
-represents the total words in text(topic), “float(sum\_topics)” indicates the
-total texts(topics) for analysis and “df[k]” represents number of the texts
+For application, the code is written as below. `float (v)` indicates the
+appearance times of candidate keywords in certain text(topic), `sum_tf`
+represents the total words in text(topic), `float(sum_topics)` indicates the
+total texts(topics) for analysis and `df[k]` represents number of the texts
 containing the certain candidate keywords.
 
-![](<file:///C:\Users\Yuqi\AppData\Local\Temp\msohtmlclip1\01\clip_image006.jpg>)
-
+```Python
+    df = {}
+    topics = cfd.conditions()
+    sum_topics = len(topics)
+    for topic in topics:
+        for k in cfd[topic].keys():
+            if k not in df:
+                df[k] = 0
+            df[k] += 1
+        
+    topic_tf_idf = {}
+    for topic in topics:
+        if topic not in topic_tf_idf:
+            topic_tf_idf[topic] = {}
+        sum_tf = len(corpus[topic])
+        for k, v in cfd[topic].items():
+            topic_tf_idf[topic][k] = float(v) / sum_tf * log(float(sum_topics)/df[k])
+```
  
 
 4)  Phrase generation by NLTK
@@ -119,30 +128,27 @@ and noun. In our test, this will arise confusion for users so this step is
 mainly about how to generate phrases instead of words as keywords. Here are
 several functions we write.
 
-The remove\_signals function basically removes the useless signals in text since
-these signals will make the spitted words a mass. The list of signals excludes “
-. ” which is used to separate sentences and “ ‘ ” which is used in many words
-such as “I’m”, “We’ve” and etc.
-
-![](<file:///C:\Users\Yuqi\AppData\Local\Temp\msohtmlclip1\01\clip_image008.jpg>)
-
- 
-
-The \_generate\_candidate\_keywords function generates keywords as phrases and
+The `generate_candidate_keywords` function generates keywords as phrases and
 words. The basic idea of this function is, for the sentences without signals
-above, to replace all stop words with “ / ” and based on this signal generate
+above, to replace all stop words with "/" and based on this signal generate
 phrases and words as candidate.
 
-![](<file:///C:\Users\Yuqi\AppData\Local\Temp\msohtmlclip1\01\clip_image010.jpg>)
-
- 
-
-5)  Output system
-
-For test we output our results in different .txt files that each review
-generates its own file to store the keywords.
-
-![](<file:///C:\Users\Yuqi\AppData\Local\Temp\msohtmlclip1\01\clip_image012.jpg>)
+```Python
+def _generate_candidate_keywords(sentences):
+    phrase_list = []
+    for sentence in sentences:
+        words = map(lambda x: "|" if x in nltk.corpus.stopwords.words() else x, nltk.word_tokenize(sentence.lower()))
+        phrase = []
+        for word in words:
+            if word == "|" or isPunct(word):
+                if len(phrase) > 0:
+                    temp = ' '.join(phrase)
+                    phrase_list.append(temp)
+                    phrase = []
+            else:
+                phrase.append(word)
+    return phrase_list
+```
 
 #### Data 
 
@@ -157,8 +163,6 @@ to convert data format to JSON for further treatment. The final data set is 1.09
 GB and has 1.6 million records of reviews. The JSON format is {“id”: “xxx”,
 “review”: “xxx”} for each.
 
-![](<file:///C:\Users\Yuqi\AppData\Local\Temp\msohtmlclip1\01\clip_image002.jpg>)
-
 **Approach**
 
 We use NLP Algorithm to generate a group of keywords, by splitting sentences
@@ -171,8 +175,7 @@ certain documents since it can split some unique words always appearing in most
 documents. However, there is an obvious disadvantage of this method, the running
 time of this greedy algorithm will increase rapidly.
 
-5. Experiment & Evaluation 
----------------------------
+## 4. Experiment & Evaluation 
 
 We have got access to a static data set of Yelp’s reviews rather than by dynamic
 request via Yelp’s API. It is not flexible, but it is low cost and can run fast.
@@ -208,29 +211,16 @@ by combining more functions provided by natural language toolkit.
 
 After optimizing the algorithm part, we have plugged the python program into our
 webpage and finished the interface between web framework and database. We
-designed a webpage for users to search the shop. Here is the interface of our
-webpage.
-
-![](<file:///C:\Users\Yuqi\AppData\Local\Temp\msohtmlclip1\01\clip_image004.jpg>)
-
- 
+designed a webpage for users to search the shop.
 
 As it’s shown above, users need to type in the name of a shop with its zip code
 for our yelp refiner to locate the specific shop. Then, it will automatically
 run keyword generation function back-end for a while. The result with ten
 keywords and phrases will pop out.
 
-![](<file:///C:\Users\Yuqi\AppData\Local\Temp\msohtmlclip1\01\clip_image006.jpg>)
-
- 
-
 Besides, we also want to present results from a commercial nature language
 processing service, AlchemyAPI as comparison, so the connection to AlchemyAPI
 has been built.
-
-![](<file:///C:\Users\Yuqi\AppData\Local\Temp\msohtmlclip1\01\clip_image008.jpg>)
-
- 
 
 AlchemyAPI can get keywords in very short time, since it only choose the most
 frequent keywords. Besides, it only generates keywords, not phrases. Compare
@@ -243,8 +233,8 @@ Comparing our results with the result from AlchemyAPI, it is clearly that
 AlchemyAPI just selects noun words and phrases instead of adjective ones while
 our project results can return some non-noun keywords.
 
-6. Conclusions and discussion 
-------------------------------
+## 5. Conclusions and discussion 
+
 
 We deploy a website to present the keywords. The website is built by Django
 which can use the keyword-generating function in the back-end. By typing in a
