@@ -77,22 +77,7 @@ such as “I”, “we” and etc. In other words, the words, which are not comm
 other documents, with a high appearance times in certain document can represent
 the main idea of the text. That’s called **Inverse Document Frequency**. Thus
 the combination of TF and IDF generate sorted words from the most importance to
-the least. Here’s a sample equation for TFIDF.
-
-$$
-TFIDF_{i,j} = (\frac{N_{i,j}}{N_{*,j}})*\log(\frac{D}{D_i})
-$$
-
-$N_{i,j}$ = the number of times word I appears in document j (the original cell
-count)
-
-$N_{*,j}$ = the number of total words in document j (just add the counts in
-column j)
-
-$D$  = the number of documents (the number of columns)
-
-$D_i$  = the number of documents in which word I appears (the number of non-zero
-columns in row i) 
+the least.
 
 For application, the code is written as below. `float (v)` indicates the
 appearance times of candidate keywords in certain text(topic), `sum_tf`
@@ -100,7 +85,7 @@ represents the total words in text(topic), `float(sum_topics)` indicates the
 total texts(topics) for analysis and `df[k]` represents number of the texts
 containing the certain candidate keywords.
 
-```Python
+{% highlight python%}
     df = {}
     topics = cfd.conditions()
     sum_topics = len(topics)
@@ -117,7 +102,7 @@ containing the certain candidate keywords.
         sum_tf = len(corpus[topic])
         for k, v in cfd[topic].items():
             topic_tf_idf[topic][k] = float(v) / sum_tf * log(float(sum_topics)/df[k])
-```
+{% endhighlight %}
  
 
 4)  Phrase generation by NLTK
@@ -133,7 +118,7 @@ words. The basic idea of this function is, for the sentences without signals
 above, to replace all stop words with "/" and based on this signal generate
 phrases and words as candidate.
 
-```Python
+{% highlight python%}
 def _generate_candidate_keywords(sentences):
     phrase_list = []
     for sentence in sentences:
@@ -148,7 +133,7 @@ def _generate_candidate_keywords(sentences):
             else:
                 phrase.append(word)
     return phrase_list
-```
+{% endhighlight %}
 
 #### Data 
 
