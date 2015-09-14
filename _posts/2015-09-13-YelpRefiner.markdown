@@ -2,7 +2,7 @@
 layout: default
 modal-id: 4
 date: 2015-09-13
-img: yelprefiner.png
+img: yelprefiner.PNG
 alt: image-alt
 project-date: Feb 2015
 category: Web Development
