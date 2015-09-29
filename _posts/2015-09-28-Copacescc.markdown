@@ -4,15 +4,10 @@ modal-id: 5
 date: 2015-09-28
 img: copacescc.png
 alt: image-alt
-project-date: September 2015
-
+project-date: Feb 2015
+category: Web Development
 ---
-
- 
-
 >   Copacescc is a web application and a windows universal application which built for Georgia Department of Transportation to collect, manage, and analyse data of roads and path.
-
- 
 
 #Explanation
 
